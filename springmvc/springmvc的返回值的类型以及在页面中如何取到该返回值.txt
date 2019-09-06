@@ -1,0 +1,265 @@
+
+
+
+
+首先，SpringMVC是支持JSTL的，并且jstl标签的性能也是较好的。所以，我们可以用基本的JSTL表达式来显示数据，和使用其他标签库一样的道理，使用JSTL标签库，我们也要先导入JSTL标签库，也就是在jsp头文件中加入声明：
+
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+在SpringMVC框架中使用JSTL标签库，需要jar包的支持，2个必须的jar包：jstl.jar 和 standard.jar
+
+
+
+
+1，数据被保存在Map中，在SpringMVC的controller中，是通过下面的操作，对数据进行封装的：
+
+//定义一个Map<String, List<Map<String, Object>>>，用来封装查询结果
+List<Map<String, Object>> mytest_list;
+mytest_list = mysqlQueryPageDao.mysqlQueryPage_1_0();
+//把查询结果封装到org.springframework.ui.ModelMap中
+model.addAttribute("mytest",mytest_list);
+
+2，在controller中，我们使用的是ModelAndView来传递数据的：
+
+//返回viewName和查询结果集model
+return new ModelAndView("/MySQLQueryPageSuccess.jsp",model);
+
+3，在jsp页面，用jstl的<c:forEach>标签来遍历Map中的数据
+
+
+
+先来看一下<c:forEach>标签的语法：
+
+语法：<c:forEach var="name" items="Collection" varStatus="statusName" begin="begin" end="end" step="step"></c:forEach>
+
+该标签有6个属性，我们常用的是var和items，var是我们自定义的名字，items是我们要遍历的Map中的key。
+
+接下来，我们来显示从数据库中查询的100条数据：
+
+<tr>
+    <td>MySQL查询分页技术</td>
+    <td>查询结果在JSP页面分页展示</td>
+    <td>SpringMVC3.0+MySQL数据库5.5</td>
+</tr>
+<c:forEach items="${mytest}" var="item">
+<tr>
+    <td>${item.myid}</td>
+    <td>${item.mydata}</td>
+    <td>${item.myname}</td>
+    <td>操作</td>
+</tr>
+</c:forEach>
+
+这里要进行一下解读：
+a，items="${mytest}"，这里的mytest是我们封装时候的Map<key,value>中的key，也就是model.addAttribute("mytest",mytest_list);这里的mytest；
+b，var="item"，这里的item，是我们自定义的名字，是别名；
+a，我的model中有3个属性，分别为myid、mydata、myname，${item.myid}这里的myid对应的是我的model实体中的属性名；
+
+这个标签是最常用的一个标签，在实际应用中，我们经常要从数据库中查询数据，然后返回到前台页面，迭代输出。
+
+好了，关于：SpringMVC如何把数据库查询结果显示到JSP页面？就说到这里，难度不大，相信大家都能解决。
+
+
+
+
+
+
+
+
+
+springmvc的返回值类型有一下几种：modelAndView、map
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+返回modelAndView有两种方法：
+
+
+
+方法一：使用modelAndView的构造方法创建要跳转的视图；调用modelAndView的addObject方法添加要返回视图指定页面的对象
+
+@Controller  
+@RequestMapping("/MVCReturn")  
+public class SpringMVCReturnController {  
+    
+     //method=RequestMethod.GET表示只能以get方法访问。。。value="/index1"表示访问路径的子路径
+    @RequestMapping(value="/index1",method=RequestMethod.GET)  
+    public ModelAndView index(){  
+
+	//要跳转的视图
+        ModelAndView modelAndView = new ModelAndView("/user/index");  
+
+	//添加的model
+        modelAndView.addObject("lisi", "xxx");  
+
+        return modelAndView;  
+    }  
+
+
+
+
+方法二：通过setViewName方法来设置视图，即所需要跳转的页面；调用modelAndView的addObject方法添加要返回视图指定页面的对象
+
+  
+      
+    @RequestMapping(value="/index2",method=RequestMethod.GET)  
+    public ModelAndView index2(){  
+        ModelAndView modelAndView = new ModelAndView();  
+        modelAndView.addObject("lisi", "xxx");  
+        modelAndView.setViewName("/user/index");  
+        return modelAndView;  
+    }  
+    //返回的是一个包含模型和视图的ModelAndView对象；  
+
+
+
+---------------------------------------------------------------------------------------
+
+
+
+在视图指定的页面中获取model的方法：
+
+
+
+普通方法：<%  request.getAttribute(“list”); %>
+
+jstl：${ lisi }
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+Map：//响应的view应该也是该请求的view。等同于void返回。
+
+    /** 
+     * Model一个模型对象， 
+     * 主要包含spring封装好的model和modelMap,以及java.util.Map， 
+     * 当没有视图返回的时候视图名称将由requestToViewNameTranslator决定；  
+     * @return 
+     */  
+    @RequestMapping(value="/index3",method=RequestMethod.GET)  
+    public Map<String, String> index3(){  
+        Map<String, String> map = new HashMap<String, String>();  
+        map.put("1", "1");  
+        //map.put相当于request.setAttribute方法  
+        return map;  
+    }  
+     
+
+
+---------------------------------------------------------------
+
+在视图指定的页面中获取model的方法：
+
+
+
+普通方法：<%  request.getAttribute(“key”); %>
+
+
+
+使用jstl遍历集合：<c:forEach items="${key}" var="item">
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+返回String，方法有两种，一种是Sting字符串对象，一种是String字符串，结果一样，都是指定跳转的视图：
+
+
+方法一：
+
+    //返回String  
+    //通过model进行使用  
+    @RequestMapping(value="/index4",method = RequestMethod.GET)  
+    public String index(Model model) {  
+        String retVal = "user/index";  
+        User user = new User();  
+        user.setName("XXX");  
+        model.addAttribute("user", user);  
+        return retVal;  
+    }  
+
+
+方法二：
+
+    //返回String  
+    //通过model进行使用  
+    @RequestMapping(value="/index4",method = RequestMethod.GET)  
+    public String index(Model model) {   
+        User user = new User();  
+        user.setName("XXX");  
+        model.addAttribute("user", user);  
+        return "user/index";  
+    }  
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+总结：其实springMVC主要是通过modelAndView将视图和model返回到modelAndView指定的视图之中。
+
+ 1、若返回的类型是ModelAndView就必须要在modelAndView中指定返回的视图和model；
+
+ 2、若返回的类型是String类型的其实就是通过String对象或string字符串指定返回的视图。（若返回值是String类型的，我们也可以通过model返回的对象带到视图指定的页面）
+
+ 3、若返回值是Sting类型和ModelAndView类型之外的类型的，也就是没有指定返回的视图的，统一返回到请求该controller的视图之中，也就是请求指定的视图。返回值也随之返回到请求的    视图之中
+
+
+
+
+
+
+
+总结：在jsp页面之中如何获取controller返回的值。
+
+
+返回的是一个普通对象：
+
+ 1、普通方法：<%  request.getAttribute(“list”); %>
+
+ 2、jstl：${ lisi }
+
+
+
+返回的是一个集合对象：
+
+ 1、普通方法：List表示集合类型，list1表示集合对象，var表示集合遍历出来的每一个元素
+
+	     <%  request.getAttribute(“list”); %>
+	     <%  for{List var : list1} %>
+
+ 2、jstl：key表示集合对象，item表示对象里面每一个元素。
+
+	 <c:forEach items="${key}" var="item">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

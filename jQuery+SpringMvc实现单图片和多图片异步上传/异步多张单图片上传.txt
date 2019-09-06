@@ -1,0 +1,315 @@
+
+
+1、java代码(框架：SpringMvc)
+
+	@RequestMapping("/addMedicine")
+	public void addMedicine(String token,String medicine_name,@RequestParam MultipartFile min_picture,
+			@RequestParam MultipartFile max_picture,String producer,String ratify_number,String effect,String ilness,
+			String symptom,String dose,String medicine_type,int market_price,int associator_price,
+			String guarantee_period,@RequestParam MultipartFile particulars_picture,
+			HttpServletRequest request,HttpServletResponse response)
+	{
+		Token tokenObj = tokenServiceImpl.getToken(null, new Object[]{token});
+	
+		System.out.println("成功了！");
+		//判断该token是否存在且有效
+		if(tokenObj!=null && UnTokenHelper.isOverTime(tokenObj.getEntry_time()))
+		{
+			//更新token最后进入的时间
+			String updateTokenTime = "update sys_token set entry_time=? where token=?";
+			baseServiceImpl.update(updateTokenTime, new Object[]{TimeHelper.getNowTimeByFormat("yyyyMMddHHmmss"),token});
+			
+			//上传小图地址
+			String min_picture_path = OTHER_IMAGE+IDUtils.genImageName()+".jpg";		
+			FileUtil.saveFile("otherImage", min_picture, request, min_picture_path);
+			
+			//上传大图地址
+			String max_picture_path = OTHER_IMAGE+IDUtils.genImageName()+".jpg";		
+			FileUtil.saveFile("otherImage", max_picture, request, max_picture_path);
+			
+			//上传详情图地址
+			String particulars_picture_path = OTHER_IMAGE+IDUtils.genImageName()+".jpg";		
+			FileUtil.saveFile("otherImage", particulars_picture, request, particulars_picture_path);
+			
+			//保存到数据库
+			String addMedicine = "insert into o_medicine(medicine_id,medicine_name,min_picture,"
+					+ "max_picture,producer,ratify_number,effect,ilness,symptom,dose,medicine_type,"
+					+ "market_price,associator_price,sales_volume,guarantee_period,particulars_picture,status) "
+					+ "values(SEQ_A.nextval,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?,0)";
+			
+			int i = baseServiceImpl.update(addMedicine, new Object[]{medicine_name,SERVER_PORT+min_picture_path,SERVER_PORT+max_picture_path,
+					producer,ratify_number,effect,ilness,symptom,dose,medicine_type,market_price,
+					associator_price,guarantee_period,SERVER_PORT+particulars_picture_path});
+			
+			if(i==1)
+			{
+				WriteHelper.write(response, "000000","成功",null);
+			}else{
+				WriteHelper.write(response, "999999","操作失败,该药品可能已经存在！",null);
+			}
+		
+		}else{
+			//token不存在或者token超时
+			WriteHelper.write(response, "666666", "你的账号已经在其他地方登录，请重新登录！", null);	
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+2 、html代码
+
+
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title></title>  
+    <link rel="stylesheet" href="css/pintuer.css">
+    <link rel="stylesheet" href="css/admin.css">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jqPaginator.js"></script>
+	<script type="text/javascript" src="js/jquery-submit.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script> 
+	<script type="text/javascript" src="js/jquery.noty.packaged.js"></script>
+	<script type="text/javascript" src="script/index.js"></script>
+</head>
+<script type="text/javascript">
+
+function addDrugs(){
+	
+	var postUrl = "/apemoonZhiAi-manager/index/addMedicine";
+	
+	 var fd = new FormData();
+	 fd.append("token", getCookie("token"));
+	 fd.append("medicine_name", $("input[name='medicine_name']").val());
+	 fd.append("producer", $("input[name='producer']").val());
+	 fd.append("ratify_number", $("input[name='ratify_number']").val());
+	 fd.append("effect", $("input[name='effect']").val());
+	 fd.append("ilness", $("input[name='ilness']").val());
+	 fd.append("symptom", $("input[name='symptom']").val());
+	 fd.append("dose", $("input[name='dose']").val());
+	 fd.append("medicine_type", $("input[name='medicine_type']").val());
+	 fd.append("market_price", $("input[name='market_price']").val());
+	 fd.append("associator_price", $("input[name='associator_price']").val());
+	 fd.append("sales_volume", $("input[name='sales_volume']").val());
+	 fd.append("guarantee_period", $("input[name='guarantee_period']").val());
+
+	//添加不同名字的三张图片
+	 fd.append("min_picture", $("input[name='min_picture']").get(0).files[0]);
+	 fd.append("max_picture", $("input[name='max_picture']").get(0).files[0]);
+	 fd.append("particulars_picture", $("input[name='particulars_picture']").get(0).files[0]);
+	 
+
+	$.ajax({
+		 url: postUrl,
+		 type: "POST",
+		 processData: false,
+		 contentType: false,
+		 data: fd,
+		 success: function(d) {
+			notyMsg("新增成功",'success');
+			
+			window.location.href="drugsList.html";
+		 }
+	 }); 
+}
+
+</script>
+<body>
+
+
+<div class="panel admin-panel">
+  <div class="panel-head"><strong><span class="icon-pencil-square-o"></span> 新增药品</strong></div>
+  <div class="head-l"></div>
+  <div class="body-content">
+    <form name="banner" method="post" class="form-x" action="" enctype="multipart/form-data">
+      
+      <div class="form-group">
+        <div class="label">
+          <label>药品名称：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="medicine_name" value="" />
+          <div class="tips"></div>
+      </div>
+    
+      <div class="form-group">
+        <div class="label">
+          <label>生产厂商：</label>
+        </div>
+        	<input type="text" class="input" style="width:45%; float:left;" name="producer" value="" />
+          <div class="tips"></div>
+      </div>
+      <div class="form-group">          
+        <div class="label">
+          <label>批准字号：</label>
+        </div>
+        	<input type="text" class="input" style="width:45%; float:left;" name="ratify_number" value="" />
+          <div class="tips"></div>
+      </div>
+      
+      <div class="form-group">
+        <div class="label">
+          <label>主治功能：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="effect" value="" />
+          <div class="tips"></div>
+      </div>
+      <div class="form-group">          
+        <div class="label">
+          <label>疾病：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="ilness" value="" />
+          <div class="tips"></div>
+      </div>
+      
+      <div class="form-group">
+        <div class="label">
+          <label>症状：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="symptom" value="" />
+          <div class="tips"></div>
+      </div>
+      <div class="form-group">          
+        <div class="label">
+          <label>用量：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="dose" value="" />
+          <div class="tips"></div>
+      </div>
+      
+      <div class="form-group">
+        <div class="label">
+          <label>药品类型：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="medicine_type" value="" />
+          <div class="tips"></div>
+      </div>
+      
+      <div class="form-group">
+        <div class="label">
+          <label>市场价：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="market_price" value="" />
+          <div class="tips"></div>
+      </div>
+      <div class="form-group">          
+        <div class="label">
+          <label>会员价：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="associator_price" value="" />
+          <div class="tips"></div>
+      </div>
+      
+      <div class="form-group">
+        <div class="label">
+          <label>销量：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="sales_volume" value="" />
+          <div class="tips"></div>
+      </div>
+      
+      <div class="form-group">
+        <div class="label">
+          <label>保质期：</label>
+        </div>
+          <input type="text" class="input" style="width:45%; float:left;" name="guarantee_period" value="" />
+          <div class="tips"></div>
+      </div>
+
+        <div class="form-group">          
+        <div class="label">
+          <label>小图：</label>
+        </div>
+        <input type="file" class="input" style="width:45%; float:left;" name="min_picture"/>
+        <div class="tips"></div>
+    	</div>
+    	        <div class="form-group">          
+        <div class="label">
+          <label>大图：</label>
+        </div>
+        <input type="file" class="input" style="width:45%; float:left;" name="max_picture" />
+        <div class="tips"></div>
+    	</div>
+    	        <div class="form-group">          
+        <div class="label">
+          <label>详情图：</label>
+        </div>
+        <input type="file" class="input" style="width:45%; float:left;" name="particulars_picture" id="particulars_picture"/>
+        <div class="tips"></div>
+    	</div>
+    	<a style="margin-left:12%;" class="button button-little bg-red" href="javascript:addDrugs();">确&nbsp;&nbsp;定</a>
+    </form>
+  </div>
+</div>
+</body></html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

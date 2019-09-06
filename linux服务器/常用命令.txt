@@ -1,0 +1,9 @@
+1、查询指定软件安装位置：示例，查找tomcat安装位置：whereis tomcat
+
+2 在指定目录查找指定文件：find /home/tomcat/tomcat7 -name 'OrderServeice.class'
+
+3、ps -ef | grep tomcat ：查询指定文件的运行信息，包括端口号和软件路径
+
+4、查找指定最后100行日志：tail -100 nohup.out
+
+5、查找日志文件中的xxx内容：cat info.log|grep 'xxx'

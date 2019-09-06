@@ -1,0 +1,152 @@
+
+
+1、思路：
+
+
+
+
+
+
+js文件：
+
+function PwerSubmit()
+{
+	
+	var token = getCookie("token");
+	var user_id = getCookie("updatePowerUserId");
+	var url = "/eroad/user/addPower";
+
+
+    //获取所有的name=power的复选框
+    var power = document.getElementsByName("power");
+
+    //声明一个数组，存放复选框选中的值
+    var check_val = [];
+
+    //将选中的值添加到数组中
+    for(var i=0;i<power.length;i++){
+        if(power[i].checked)
+            check_val.push((power[i].value));
+    }
+	
+    //将一个数组转为一个指定分隔符分隔字符串
+    var powerStr = check_val.join(",");
+  
+
+	//将数据提交到后台接口
+	$.submitParams(url,{"token":token,"user_id":user_id,"powerStr":powerStr},function(rootData,resData)
+			{
+		//重新加载当前页面
+		if(resData.errorCode == '000000')
+			{
+			}		
+			});
+}
+
+
+
+
+
+
+java接口：
+
+	/**
+	 * 修改管理员权限
+	 * 
+	 * @param token
+	 * @param user_id	被修改权限的用户的用户id
+	 * @param powerStr	权限组成的字符串
+	 * @param request
+	 * @param response
+	 * 
+	 * http://localhost:8080/eroad/user/addPower?token=&user_id=&power=
+	 */
+	@RequestMapping("/addPower")
+	public void addPower(String token,int user_id,String powerStr,
+			HttpServletRequest request,HttpServletResponse response)
+	{
+		if(powerStr!=null&&powerStr!="")
+		{
+			String[] power = powerStr.split(",");
+			
+			if(user_id!=1)
+			{
+				Token tokenObj = tokenServiceImpl.getToken(null, new Object[]{token});
+				
+				//判断该token是否存在且有效
+				if(tokenObj!=null && UnTokenHelper.isOverTime(tokenObj.getEntry_time()))
+				{
+					//更新token最后进入的时间
+					String updateTokenTime = "update u_token set entry_time=? where token=?";
+					baseServiceImpl.update(updateTokenTime, new Object[]{TimeHelper.getNowTimeByFormat("yyyyMMddHHmmss"),token});
+					
+					//删除指定id的所有权限
+					String deletePower = "delete sys_user_menu where user_id=?";
+					baseServiceImpl.update(deletePower, new Object[]{user_id});
+					
+					if(power!=null)
+					{
+						//添加新的权限
+						for(String p:power)
+						{
+							String addPower = "insert into sys_user_menu(user_id,menu_id) values(?,?)";
+							baseServiceImpl.update(addPower, new Object[]{user_id,p});
+						}
+					}
+					
+					WriteHelper.write(response, "000000", "管理员权限修改成功！", null);
+					
+				}else{
+					
+					//token不存在或者token超时
+					WriteHelper.write(response, "666666", "登录超时,请重新登录！", null);	
+				}		
+
+			}else{
+				WriteHelper.write(response, "999999", "超级管理员的权限不能修改！", null);
+			}
+		}else{
+			WriteHelper.write(response, "999999", "不能设置用户权限为空！", null);
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

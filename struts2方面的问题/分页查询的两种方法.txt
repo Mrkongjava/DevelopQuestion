@@ -1,0 +1,97 @@
+
+
+方法一：离线查询
+
+
+	其中Product.class指的是被查询的表对应的实体类的class对象。0和10分别表示开始查询的序数和结束查询的序数
+
+
+
+	// 首页上热门商品查询
+	public List<Product> findHot() {
+		// 使用离线条件查询.即使用DetachedCriteria构造查询条件 
+		DetachedCriteria criteria = DetachedCriteria.forClass(Product.class);
+		// 查询热门的商品,条件就是is_host = 1
+		criteria.add(Restrictions.eq("is_hot", 1));
+		// 倒序排序输出:将查询出来的对象按日期倒序排序
+		criteria.addOrder(Order.desc("pdate"));
+		// 执行查询:
+		List<Product> list = this.getHibernateTemplate().findByCriteria(
+				criteria, 0, 10);
+		return list;
+	}
+
+
+
+
+
+
+
+
+
+
+方法二：复杂的分页查询
+
+
+本来在execute方法中要实现PageHibernateCallback方法，并传入sql语句，然后用session去执行该sql语句，此处将要执行的PageHibernateCallback方法抽取出来成为一个工具类，使得以后所有需要实现该复杂分页的语句都可以调用该工具类，只要传入相应的参数即可，参数有：hql语句、hql语句中的条件、分页开始数、每页显示数；简化代码
+
+		// 分页另一种写法:
+		List<Product> list = this.getHibernateTemplate().execute(new PageHibernateCallback<Product>(hql, new Object[]{cid}, begin, limit));
+		if(list != null && list.size() > 0){
+			return list;
+		}
+
+
+
+
+
+
+
+
+工具类：
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.springframework.orm.hibernate3.HibernateCallback;
+
+public class PageHibernateCallback<T> implements HibernateCallback<List<T>>{
+	
+	private String hql;
+	private Object[] params;
+	private int startIndex;
+	private int pageSize;
+	
+
+	public PageHibernateCallback(String hql, Object[] params,
+			int startIndex, int pageSize) {
+		super();
+		this.hql = hql;
+		this.params = params;
+		this.startIndex = startIndex;
+		this.pageSize = pageSize;
+	}
+
+
+
+	public List<T> doInHibernate(Session session) throws HibernateException,
+			SQLException {
+		//1 执行hql语句
+		Query query = session.createQuery(hql);
+		//2 实际参数
+		if(params != null){
+			for(int i = 0 ; i < params.length ; i ++){
+				query.setParameter(i, params[i]);
+			}
+		}
+		//3 分页
+		query.setFirstResult(startIndex);
+		query.setMaxResults(pageSize);
+		
+		return query.list();
+	}
+
+}

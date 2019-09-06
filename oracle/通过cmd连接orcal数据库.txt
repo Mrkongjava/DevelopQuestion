@@ -1,0 +1,1 @@
+输入sqlplus回车,然后提示输入用户名,直接输入user/password@database就可以了，然后出来sql>，就可以输入各种语句了

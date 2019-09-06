@@ -1,0 +1,37 @@
+
+
+	//自动执行的ajax
+
+	$.ajax({
+		type : "POST",
+		url : path + "user/synWxUserInfo",
+		data : {
+			"code" : code
+		},
+		dataType : "json",
+		success : function(data) {
+			var code = data.code;
+			var message = data.message;
+			if (code == "0000") {
+				var customer = data.result.customer;
+				var userId = customer.id;
+				var wxUuid = customer.wxUuid;
+				var headImage = customer.headImage;
+				var wxName = customer.wxName;
+				var gameCurrency = customer.gameCurrency;
+				var booty = customer.booty;
+
+				sessionStorage.setItem("userId", userId);
+				sessionStorage.setItem("openid", wxUuid);
+
+				$(".top .name").html(wxName);
+				//$(".top .xinxi").html(wxUuid);
+				//                 $(".top .photo").css("background",'rgba(0, 0, 0, 0) url("'+headImage+'") no-repeat scroll 0% 0% / cover padding-box border-box');
+				$("#headImage").attr("src", headImage);
+				$(".youhui .middle a").html(gameCurrency);
+				$(".youhui .right a").html(booty);
+			} else {
+				alert(message);
+			}
+		}
+	});

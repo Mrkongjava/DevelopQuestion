@@ -1,0 +1,7 @@
+
+
+1、获取id值为动态的标签对象的value值。
+
+		例如：有一个input标签，该标签的id属性为一个动态的值，即id = u_id ，我们若想要获取该标签对象，直接用js的dom对象，var remarks = document.getElementById(u_id).value;
+
+		不要使用jQuery，因为jQuery中是 $("#id值").val(); 不好运用

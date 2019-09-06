@@ -1,0 +1,42 @@
+ 3种方法解决Struts2中forward问题！通过jspforward跳转到WEB-INF 下的action中
+
+	在Struts2中沿用Struts1.2的<jsp:forward page="xxx.action"></jsp:forward>失效，报404错误。因为Struts2采用过滤器的方式处理请求,REQUEST,当到达页面时FORWARD跳到Action。但是这个客户端的FORWARD并没有被拦截下来，所以找不到了。从而报出404错。记得当时试过很多方法，都不行。连一些基本的include都无法使用，所以研究了一下，结合网友提供的。解决办法
+
+
+
+struts2的核心过滤器只拦截请求，而<jsp:forward page="xxx.action"></jsp:forward>只是一个转发，不会被struts2的核心过滤器所拦截想要该转发也被拦截那么就按方法一去做；也就是增加对转发的拦截。
+
+
+方法一：配置web.xml 解决，增加对FORWARD请求的过滤，自然问题就解决了，代码如下:
+
+
+要注意的是若要既拦截请求又拦截转发，就必须将<dispatcher>REQUEST</dispatcher> 、<dispatcher>FORWARD</dispatcher>都写上，若只写<dispatcher>FORWARD</dispatcher>就是只是拦截请求，若写<dispatcher>FORWARD</dispatcher>就只是拦截转发。也就是说默认存在<dispatcher>REQUEST</dispatcher>
+
+
+     <filter-mapping> 
+    	<filter-name>struts2</filter-name> 
+    	<url-pattern >/*</url-pattern> 
+    	<dispatcher>INCLUDE</dispatcher>    //增加对<jsp:include page="xxx.action"/>及其<s:include value="xxx.action"/>支持
+    	<dispatcher>REQUEST</dispatcher> 
+    	<dispatcher>FORWARD</dispatcher>   
+    </filter-mapping> 
+
+
+
+
+
+方法二：用JavaScript解决，让请求执行到页面时，接着执行如下的代码，发现页面需要重载，然后就重新发送请求REQUEST，这样当然就会被过滤器所截获到了。该代码是放在jsp页面的	head标签下的。
+
+	<script language="javascript">location.replace(URL)</script>
+
+
+
+
+
+
+方法三：利用html meta,等于也是让页面等待零秒刷新页面，重新发送请求，达到目的。该代码是放在jsp页面的head标签下的。
+
+
+
+	<meta http-equiv="refresh" content="0;URL=xxx.action">；
+	

@@ -1,0 +1,28 @@
+[root@localhost ~]# echo $ORACLE_HOME
+/opt/oracle/product/11.2.0/db_1
+
+[root@localhost ~]# su oracle
+[oracle@localhost root]$ export ORACLE_HOME=/opt/oracle/product/11.2.0/db_1
+[oracle@localhost root]$ cd /opt/oracle/product/11.2.0/db_1/bin/
+[oracle@localhost bin]$ ./sqlplus /nolog
+
+SQL*Plus: Release 11.2.0.1.0 Production on Fri Nov 18 04:55:08 2016
+
+Copyright (c) 1982, 2009, Oracle.  All rights reserved.
+
+
+SQL> connect /as sysdba
+Connected.
+
+
+SP2-0734: unknown command beginning "createus..." - rest of line ignored.
+
+
+SQL> create user zhiai identified by zhiai ;      //创建一个用户名和密码都是zhiai的用户
+
+User created.
+
+
+SQL> grant connect,resource to zhiai; //为该用户赋予权限。
+
+Grant succeeded.

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="image.css" media="screen">
+</head>
+
+<body>
+
+<img id="myImg" src="a.jpg" alt="Snow" style="width:100%;max-width:300px" class="MyImg">
+
+<div id="myModal" class="modal">
+
+  <span class="close">&times;</span>
+
+  <img class="modal-content" id="img01">
+
+  <div id="caption"></div>
+</div>
+
+</body>
+
+<script type="text/javascript">
+	var modal = document.getElementById('myModal');
+
+	var img = document.getElementById('myImg');
+	var modalImg = document.getElementById("img01");
+	var captionText = document.getElementById("caption");
+	img.onclick = function(){
+		modal.style.display = "block";
+		modalImg.src = this.src;
+		captionText.innerHTML = this.alt;
+	}
+
+	var span = document.getElementsByClassName("close")[0];
+
+	span.onclick = function() { 
+	  modal.style.display = "none";
+	}
+</script>
+</html>

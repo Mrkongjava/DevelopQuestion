@@ -1,0 +1,55 @@
+javascript、js操作json方法总结
+2014年9月3日 7429次浏览
+
+相信前端的同学们对json并不陌生，接触过很多。但是很少人知道json的全称是什么，哈哈，我也是查资料知道的。（JSON JavaScript Object Notation是一种轻量级的数据交换格式，采用完全独立于语言的文本格式，是理想的数据交换格式。）
+
+json可以以数组传递，也可以以对象传递，我前面的文章PHP对发布版本时间轴数据处理，返回的json格式，是一个数组json，然后里面含有对象，这是json常见的格式。后来经过php的处理，结构又发生了变化，最外层是一个对象了，里面是数组和对象。
+
+在数据传输流程中，json是以文本，即字符串的形式传递的，而JS操作的是JSON对象，所以，JSON对象和JSON字符串之间的相互转换是关键。例如：
+
+JSON字符串:
+
+var str1 = '{ "name": "haorooms", "sex": "man" }';
+
+JSON对象:
+
+var str2 = { "name": "haorooms", "sex": "man" };
+
+一、JSON字符串转换为JSON对象
+
+要运用上面的str1，必须运用下面的要领先转化为JSON对象(这一点在ajax返回的时候，经常遇到！)：
+
+//由JSON字符串转换为JSON对象
+
+var obj = eval('(' + str + ')');
+
+或者
+
+var obj = str.parseJSON(); //由JSON字符串转换为JSON对象
+
+或者
+
+var obj = JSON.parse(str); //由JSON字符串转换为JSON对象
+
+然后，就可以这样读取：
+
+Alert(obj.name);
+
+Alert(obj.sex);
+
+特别注意：如果obj本来就是一个JSON对象，那么运用 eval（）函数转换后（哪怕是多次转换）还是JSON对象，但是运用 parseJSON（）函数处理后会有疑问（抛出语法异常）。
+二、可以运用 toJSONString()或者全局要领 JSON.stringify()将JSON对象转化为JSON字符串。
+
+例如：
+
+var last=obj.toJSONString(); //将JSON对象转化为JSON字符
+
+或者
+
+var last=JSON.stringify(obj); //将JSON对象转化为JSON字符
+
+alert(last);
+
+上面的多个要领中，除了eval()函数是js自带的之外，其他的多个要领都来自json.js包。新版本的 JSON 修改了 API，将 JSON.stringify() 和 JSON.parse() 两个要领都注入到了 Javascript 的内建对象里面，前者变成了 Object.toJSONString()，而后者变成了 String.parseJSON()。如果提示找不到toJSONString()和parseJSON()要领，则说明您的json包版本太低。
+
+上面是对javascript的简单总结，部分总结参考网络。但是很多在平时都用的到，特别是json字符转对象的操作！这点是非常重要的！

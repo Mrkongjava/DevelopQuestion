@@ -1,0 +1,68 @@
+
+
+count(1)和count（*）和count（字段名）的区别：
+
+
+
+其实1就代表你这个查询的表里的第一个字段
+
+
+这里用1，也是为了方便，当然如果数据量较大的话，也可以提高速度，因为写count(*)的话会所有列扫描，这里用1的话或者用字段名的话，只扫描你写的那个列
+ 
+顺便给你扩展下
+ 
+count(*)和count(字段名)  基本结果是一样的
+但是一种情况例外，就是当某字段名下边的数据有null值的时候，不计入这个count中，*则全部列入count中
+
+
+------------------------------------------------------------------------------------------------
+
+
+count(1）：查询指定表中第一列中不为空的行数。
+
+     例如：select count（1） from User;       表示查询user表中第一列中，不为空的行数
+
+	  select count（1） from User where name="张三";     表示查询user表第一列中name=张三且不为空的行的数量
+
+
+
+
+count(字段）：查询指定表中指定字段所在列中不为空的行数。
+
+     例如：select count（age） from User;       表示查询user表中字段是age的这一列中，不为空的行数
+
+	  select count（age） from User where name="张三";     表示查询user表字段是age的这一列中 name=张三 且不为空的行的数量
+
+
+
+
+
+count(*）：查询指定表中所有行数。
+
+     例如：select count（*） from User;       表示查询user表中所有的行数
+
+	  select count（*） from User where name="张三";     表示查询user表中  name=张三  的行数
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

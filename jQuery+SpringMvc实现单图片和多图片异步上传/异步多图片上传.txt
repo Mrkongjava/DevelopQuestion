@@ -1,0 +1,285 @@
+
+
+1、java代码：
+
+
+	@RequestMapping("/addDrugstore")
+	public void addDrugstore(String token,String drugstore_name,String address,
+			String phone,@RequestParam(required=false) MultipartFile[] image_address,String longitude,String latitude,
+			HttpServletRequest request,HttpServletResponse response)
+	{
+		Token tokenObj = tokenServiceImpl.getToken(null, new Object[]{token});
+		
+		//判断该token是否存在且有效
+		if(tokenObj!=null && UnTokenHelper.isOverTime(tokenObj.getEntry_time()))
+		{
+			//更新token最后进入的时间
+			String updateTokenTime = "update sys_token set entry_time=? where token=?";
+			baseServiceImpl.update(updateTokenTime, new Object[]{TimeHelper.getNowTimeByFormat("yyyyMMddHHmmss"),token});
+			String filePathUpload="";
+			int h = image_address.length;
+			for(int i=0;i<image_address.length;i++){
+				MultipartFile file = image_address[i];
+				if(!file.isEmpty()){
+					String filePath = OTHER_IMAGE+IDUtils.genImageName()+".jpg";
+					//保存文件
+					FileUtil.saveFile("otherImage",file,request,filePath);
+					
+					if(filePathUpload==""){
+						filePathUpload = SERVER_PORT+filePath;
+					}else{
+						filePathUpload = filePathUpload+","+SERVER_PORT+filePath;
+					}
+				}
+			}
+			String addHospital = "insert into o_drugstore( drugstore_id,drugstore_name,"
+					+ "address,phone,image_address,longitude,latitude) "
+					+ "values(SEQ_A.nextval,?,?,?,?,?,?)";
+			int i = baseServiceImpl.update(addHospital, new Object[]{drugstore_name,address,phone,filePathUpload,longitude,latitude});
+			
+			if(i==1)
+			{
+				//response.sendRedirect("pharmacyList.html");
+				WriteHelper.write(response, "000000","成功",null);
+			}else{
+				WriteHelper.write(response, "999999","操作失败,该药店可能已经存在！",null);
+			}
+		
+		}else{
+			//token不存在或者token超时
+			WriteHelper.write(response, "666666", "你的账号已经在其他地方登录，请重新登录！", null);	
+		}
+	}
+
+
+
+
+
+
+
+
+
+2、html代码：
+
+
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title></title>  
+    <link rel="stylesheet" href="css/pintuer.css">
+    <link rel="stylesheet" href="css/admin.css">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jqPaginator.js"></script>
+	<script type="text/javascript" src="js/jquery-submit.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script> 
+	<script type="text/javascript" src="js/jquery.noty.packaged.js"></script>
+	<script type="text/javascript" src="script/index.js"></script>
+</head>
+<script type="text/javascript">
+function addpharmacy(){
+	var postUrl = "/apemoonZhiAi-manager/index/addDrugstore";
+	 var fd = new FormData();
+	 fd.append("token", getCookie("token"));
+	 fd.append("drugstore_name", $("input[name='drugstore_name']").val());
+	 fd.append("address", $("input[name='address']").val());
+	 fd.append("phone", $("input[name='phone']").val());
+	 fd.append("longitude", $("input[name='longitude']").val());
+	 fd.append("latitude", $("input[name='latitude']").val());
+// 	 fd.append("image_address", $("input[name='image_address']").get(0).files[0]);
+	 
+
+	//异步多图片上传，其中的files[i]是js中的方法，以为获取等待上传的文件。
+
+	 var imageList = $("input[name='image_address']");
+	 alert(imageList.length);
+	 for(var i=0;i<imageList.length;i++)
+		 {
+		 	fd.append("image_address",imageList.get(i).files[0]);
+		 }
+
+	 
+	$.ajax({
+		 url: postUrl,
+		 type: "POST",
+		 processData: false,
+		 contentType: false,
+		 data: fd,
+		 success: function(d) {
+			notyMsg("新增成功",'success');
+			
+			window.location.href="pharmacyList.html";
+		 }
+	 }); 
+}
+
+</script>
+<body>
+<div class="panel admin-panel">
+  <div class="panel-head"><strong><span class="icon-pencil-square-o"></span> 新增药店</strong></div>
+  <div class="head-l"></div>
+  <div class="body-content">
+    <form name="banner" method="post" class="form-x" action="" enctype="multipart/form-data">
+        <div class="form-group">          
+        <div class="label">
+          <label>药店名称：</label>
+        </div>
+        <input type="text" class="input" style="width:45%; float:left;" name="drugstore_name"/>
+        <div class="tips"></div>
+    	</div>
+    	        <div class="form-group">          
+        <div class="label">
+          <label>药店地址：</label>
+        </div>
+        <input type="text" class="input" style="width:45%; float:left;" name="address"/>
+        <div class="tips"></div>
+    	</div>
+    	        <div class="form-group">          
+        <div class="label">
+          <label>电话号码：</label>
+        </div>
+        <input type="text" class="input" style="width:45%; float:left;" name="phone"/>
+        <div class="tips"></div>
+    	</div>
+    	        <div class="form-group">          
+        <div class="label">
+          <label>经度值：</label>
+        </div>
+        <input type="text" class="input" style="width:45%; float:left;" name="longitude"/>
+        <div class="tips"></div>
+    	</div>
+    	        <div class="form-group">          
+        <div class="label">
+          <label>纬度值：</label>
+        </div>
+        <input type="text" class="input" style="width:45%; float:left;" name="latitude"/>
+        <div class="tips"></div>
+    	</div>
+        <div class="form-group">          
+        <div class="label">
+          <label>图片1：</label>
+        </div>
+        <input type="file" class="input" style="width:45%; float:left;" name="image_address"/>
+        <div class="tips"></div>
+    	</div>
+    	        <div class="form-group">          
+        <div class="label">
+          <label>图片2：</label>
+        </div>
+        <input type="file" class="input" style="width:45%; float:left;" name="image_address"/>
+        <div class="tips"></div>
+    	</div>
+    	        <div class="form-group">          
+        <div class="label">
+          <label>图片3：</label>
+        </div>
+        <input type="file" class="input" style="width:45%; float:left;" name="image_address"/>
+        <div class="tips"></div>
+    	</div>
+    	<a style="margin-left:12%;" class="button button-little bg-red" href="javascript:addpharmacy();">确&nbsp;&nbsp;定</a>
+    </form>
+  </div>
+</div>
+</body></html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

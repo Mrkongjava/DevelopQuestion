@@ -1,0 +1,91 @@
+
+
+
+
+
+
+
+
+
+
+
+
+springmvc上传文件报错org.springframework.beans.BeanInstantiationException: Could not instantiate bean class [org.springframework.web.multipart.MultipartFile]
+在用springmvc+mybatis进行项目开发时，上传文件抛异常...
+
+复制代码
+org.springframework.beans.BeanInstantiationException: Could not instantiate bean class [org.springframework.web.multipart.MultipartFile]: Specified class is an interface
+    org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:101)
+    org.springframework.web.bind.annotation.support.HandlerMethodInvoker.resolveModelAttribute(HandlerMethodInvoker.java:762)
+    org.springframework.web.bind.annotation.support.HandlerMethodInvoker.resolveHandlerArguments(HandlerMethodInvoker.java:356)
+    org.springframework.web.bind.annotation.support.HandlerMethodInvoker.invokeHandlerMethod(HandlerMethodInvoker.java:171)
+    org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter.invokeHandlerMethod(AnnotationMethodHandlerAdapter.java:426)
+    org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter.handle(AnnotationMethodHandlerAdapter.java:414)
+    org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:790)
+    org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:719)
+    org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:644)
+    org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:560)
+    javax.servlet.http.HttpServlet.service(HttpServlet.java:646)
+    javax.servlet.http.HttpServlet.service(HttpServlet.java:727)
+    org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:52)
+    org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:88)
+    org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:76)
+    org.springframework.orm.hibernate3.support.OpenSessionInViewFilter.doFilterInternal(OpenSessionInViewFilter.java:198)
+    org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:76)
+复制代码
+解决方法：在Controller的MultipartFile参数前面加上@RequestParam就行了！
+
+如：
+
+复制代码
+@RequestMapping("/save")
+    public String save(User user,
+            HttpServletResponse response,
+            @RequestParam MultipartFile file_pic//接收图片
+            )throws Exception{
+        
+        //原始名称
+        String originalFilename = file_pic.getOriginalFilename();
+        //上传图片
+        if(file_pic!=null && originalFilename!=null && originalFilename.length()>0){
+            //存储图片的物理路径
+            String pic_path = "G:\\nfsysuems\\temp\\";
+            //新的图片名称
+            String newFileName = UUID.randomUUID() + originalFilename.substring(originalFilename.lastIndexOf("."));
+            //新图片
+            File newFile = new File(pic_path+newFileName);
+            //将内存中的数据写入磁盘
+            file_pic.transferTo(newFile);
+            //新图片写入user
+            user.setPic(newFileName);
+        }
+      .......
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

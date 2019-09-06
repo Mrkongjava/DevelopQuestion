@@ -1,0 +1,1 @@
+update qp_cust_info set num=num+1 where cust_no=10000

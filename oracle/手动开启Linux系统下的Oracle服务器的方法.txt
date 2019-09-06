@@ -1,0 +1,13 @@
+
+
+1、使用oracle用户操作，即在root用户下输入su oracle后回车
+
+2、开启监听程序：进入到Oracle安装路径的bin目录下，然后输入 ./lsnrctl start 回车
+
+3、接着输入 ./sqlplus /nolog ，就会然后就会出现sql输入标签
+
+4、输入connect /as sysdba 后回车
+
+5、输入 startup  后回车
+
+6、最后关闭sql输入，输入exit就行

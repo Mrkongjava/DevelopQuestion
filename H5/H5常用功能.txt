@@ -1,0 +1,4 @@
+
+1、超链接 a 标签去掉下划线。使用css样式完成,例如：<a style="text-decoration:none" href="record.html">消费记录</a>
+
+2、获取url中指定key的值	var couponid = getUrlParam("couponid");

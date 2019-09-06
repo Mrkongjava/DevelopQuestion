@@ -1,0 +1,8 @@
+
+
+//方法 一  
+System.currentTimeMillis();   
+//方法 二  
+Calendar.getInstance().getTimeInMillis();  
+//方法 三  
+new Date().getTime();  

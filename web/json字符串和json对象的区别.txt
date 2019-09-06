@@ -1,0 +1,39 @@
+JSON字符串与JSON对象的区别
+2014年10月11日 9763次浏览
+JSON字符串与JSON对象的区别
+
+本篇文章是对javascript、js操作json方法总结 http://www.haorooms.com/post/js_jsons_h 这篇文章的补充说明，有朋友问JSON字符串与JSON对象的区别，下面说一下。
+
+JSON对象是直接可以使用JQuery操作的格式，和js中的对象一样，可以用对象（类名）点出属性（方法）。
+
+JSON字符串仅仅只是一个字符串，一个整体，不截取的话没办法取出其中存储的数据，不能直接使用，除非你只想alert()他；
+
+JSON对象:
+
+var str2 = { "name": "haorooms", "sex": "man" };
+
+JSON字符串:
+
+var str1 = '{ "name": "haorooms", "sex": "man" }';
+
+"JSON字符串"转化为"JSON对象"
+
+请看http://www.haorooms.com/post/js_jsons_h
+读取JSON对象的方法
+
+var str2 = { "name": "haorooms", "sex": "man" };
+
+就可以这样读取：
+
+alert(str2.name);
+//弹出” haorooms”。
+
+我们遇到的JSON很少有这么简单的，比如复杂一点的JSON对象如：
+
+var str={"GetUserPostByIdResult":{"Age":"33","ID":"2server","Name":"haorooms"}};
+
+解析用：
+
+alert(str.GetUserPostByIdResult.Name); //弹出haorooms
+
+此文很简单，是对之前文章的补充说明！只对新手！
