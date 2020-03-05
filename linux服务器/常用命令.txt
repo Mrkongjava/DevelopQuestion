@@ -7,3 +7,5 @@
 4、查找指定最后100行日志：tail -100 nohup.out
 
 5、查找日志文件中的xxx内容：cat info.log|grep 'xxx'
+
+6、创建目录：mkdir -p /root/kxq/xxx    加上参数-p表示，若上层目录没有，连带将上层目录也创建出来；
