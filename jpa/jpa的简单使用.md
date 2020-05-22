@@ -136,6 +136,10 @@ List<Course> getJpAllCourse();
 ```
 @Query(value="select c.* from course c ",nativeQuery=true)
 List<Course> getallcourse();
+
+若是增删改，则还需要添加以下两个注解，否则会报错
+@Modifying
+@Transactional
 ```
 
 3）涉及到修改和删除的需要加上@Modifying，也需要加上@Transactional实现对事务的支持。
