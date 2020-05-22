@@ -55,3 +55,55 @@ alert( num.toFixed(2));
 </script>
 ```
 
+# 4、清空JS数组中的空值
+
+```
+/**
+ * 过滤JS数组中的空值，返回新的数组
+ * @param array 需要过滤的数组
+ * @returns {Array} []
+ */
+
+function clear_arr_trim(array) {
+    for(var i = 0 ;i<array.length;i++)
+    {
+        if(array[i] == "" || typeof(array[i]) == "undefined")
+        {
+            array.splice(i,1);
+            i= i-1;
+        }
+    }
+    return array;
+}
+
+/** 
+ * es6语法
+ * 过滤JS数组中的空值,假值等(es6语法)
+ * @param array 需要过滤的数组 
+ * @returns {Array} [] 
+ */  
+function filter_array(array) {  
+  return array.filter(item=>item); 
+} 
+//调用
+var arr = [undefined,undefined,1,'','false',false,true,null,'null'];   
+```
+
+# 5、判断一个对象是不是Array
+
+```
+1.Array.isArray(obj) 调用数组的isArray方法
+
+2.obj instanceof Array  判断对象是否是Array的实例
+
+3.Object.prototype.toString.call(obj) ===‘[object Array]’  
+  Object.prototype.toString方法会取得对象的一个内部属性［［Class］］，然后依据这个属性，返回一个类似于［object Array］的字符串作为结果，call用来改变toString的this指向为待检测的对象
+     
+4.判断对象是否有push等数组的一些方法。（这个方法有兼容问题，但也是一个简单易用的方法）
+    
+5.obj.constructor===Array   //true
+
+同理判断一个对象是否是函数：
+console.log(Object.prototype.toString.call(obj)==='[object Function]')    //true或false 
+```
+
