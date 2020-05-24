@@ -249,9 +249,104 @@ console.log(typeof jsonObject)
 
 
 
-# 8、
+# 8、常见校验
 
- 
+## 	8.1 判断字符串是否为数字
+
+```js
+//正则方式
+//字符串和数字都是true
+var value ="1";
+var re = /^[0-9]+.?[0-9]*$/;
+if (!re.test(value))
+{
+    console.log("非数字")
+}
+
+// isNaN函数方式
+//字符串和数字都是true
+var num = "sdf";
+if(isNaN(num)){
+    console.log('num不是数字');
+}
+```
+
+##  	8.2 判断正整数
+
+```js
+//字符串和数字的正整数都是true
+var value ="是";
+var re = /^[1-9]+[0-9]*]*$/;
+
+if (!re.test(value))
+{
+    console.log("非正整数")
+}
+```
+
+## 	8.3 判断是否为正数
+
+```js
+var num = "s";
+var reg = /^\d+(?=\.{0,1}\d+$|$)/
+if(reg.test(num)){
+    console.log("是正数")
+    }
+```
+
+## 	8.4. 判断是否整数、正数、非数值
+
+```js
+// 1、判断是否为一个数字：不为 NaN，说明为数字
+var num = "a";
+console.log(Number(num))
+
+// 2、 判断一个数为正数：
+if(Number(num)>0){
+    console.log("您输入的是一个正数！")
+}
+
+// 3、判断一个数为整数：
+if(parseInt(num)==parseFloat(num)){
+    console.log("您输入的是一个整数！");
+}
+
+// 4、判断非数值：
+if(!Number(num)&&Number(num)!=0){
+    console.log("非数值")
+}
+
+
+// 注意一：
+//
+// if()中的表达式，运算之后的结果应该是：
+//
+// ① Boolean: true 真 false 假
+// ② String：非空字符串为真 空字符串为假
+// ③ Null/NaN/Undefined:全为假
+// ④ Object：全为真
+// ⑤ Number：0为假，一切非0均为真
+//
+// 注意二：
+// Number():将其他类型转换成数值类型
+// 【字符串类型转数值】
+// \>>> 字符串为纯数值字符串，会转为对应的数字
+// \>>> 字符串为空字符串时，会转为0
+// \>>> 字符串包含其他非数字字符时，不能转换，为NaN，如 "111a"->NaN
+```
+
+## 	8.5 判断字段不为空串、null、undefined、0
+
+```
+//若a为空串、null、undefined、数字0，!a都会返回true；但若a为"0"时，返回false，即"0"也会被当做一个值
+
+var a = null
+
+//判断
+if(!a){
+console.log("-----------------")
+}
+```
 
 
 
@@ -353,16 +448,72 @@ Print(){
 
 
 
-# 12、判断字段不为空串、null、undefined、0 
+# 12、取整、取余方法
 
-```
-//若a为空串、null、undefined、数字0，!a都会返回true；但若a为"0"时，返回false，即"0"也会被当做一个值
+```js
+// 1.丢弃小数部分,保留整数部分
+parseInt(5/2)
+// 2.向上取整,有小数就整数部分加1
+Math.ceil(5/2)
+// 3,四舍五入.
+Math.round(5/2)
+// 4,向下取整
+Math.floor(5/2)
+// Math 对象的方法
 
-var a = null
-
-//判断
-if(!a){
-console.log("-----------------")
+// FF: Firefox, N: Netscape, IE: Internet Explorer
+// 方法 描述 FF N IE
+// abs(x) 返回数的绝对值 1 2 3
+// acos(x) 返回数的反余弦值 1 2 3
+// asin(x) 返回数的反正弦值 1 2 3
+// atan(x) 以介于 -PI/2 与 PI/2 弧度之间的数值来返回 x 的反正切值 1 2 3
+// atan2(y,x) 返回从 x 轴到点 (x,y) 的角度（介于 -PI/2 与 PI/2 弧度之间） 1 2 3
+// ceil(x) 对一个数进行上舍入。 1 2 3
+// cos(x) 返回数的余弦 1 2 3
+// exp(x) 返回 e 的指数。 1 2 3
+// floor(x) 对一个数进行下舍入。 1 2 3
+// log(x) 返回数的自然对数（底为e） 1 2 3
+// max(x,y) 返回 x 和 y 中的最高值 1 2 3
+// min(x,y) 返回 x 和 y 中的最低值 1 2 3
+// pow(x,y) 返回 x 的 y 次幂 1 2 3
+// random() 返回 0 ~ 1 之间的随机数 1 2 3
+// round(x) 把一个数四舍五入为最接近的整数 1 2 3
+// sin(x) 返回数的正弦 1 2 3
+// sqrt(x) 返回数的平方根 1 2 3
+// tan(x) 返回一个角的正切 1 2 3
+// toSource() 代表对象的源代码 1 4 -
+// valueOf() 返回一个 Math 对象的原始值
+    
+// 代码案例：
+<script type="text/javascript">
+    //取整
+    function getResult(num){
+        return parseInt(num);
+    }
+//四舍五入到num后面的n位
+function getResult(num,n){
+    return Math.round(num*Math.pow(10,n))/Math.pow(10,n);
 }
+//截取n位
+function getresult(num,n){
+    return num.toString().replace(new RegExp("^(\\-?\\d*\\.?\\d{0,"+n+"})(\\d*)$"),"$1")+0;
+}
+</script>
+
+// 其他：
+// 复制代码代码如下:
+var mLength = textMn.length;
+var mFirst = parseInt(mLength/60);
+//取整 
+//alert(mLength); 
+var mLast = mLength; //取余 
+if(mLast>0){
+    $(".mood_content").height((mFirst+1)*20);
+}
+
+
 ```
 
+
+
+13、常见校验
