@@ -1,4 +1,5 @@
-HashMap和HashTable有什么不同？在面试和被面试的过程中，我问过也被问过这个问题，也见过了不少回答，今天决定写一写自己心目中的理想答案。
+HashMap和HashTable有什么不同？
+在面试和被面试的过程中，我问过也被问过这个问题，也见过了不少回答，今天决定写一写自己心目中的理想答案。
 
 代码版本
 JDK每一版本都在改进。本文讨论的HashMap和HashTable基于JDK 1.7.0_67。源码见这里
@@ -31,9 +32,6 @@ HashMap和HashTable都是基于哈希表来实现键值映射的工具类。讨论他们的不同，我们首先
 
 3.1 Public Method
 下面两张图，我画出了HashMap和HashTable的类继承体系，并列出了这两个类的可供外部调用的公开方法。
-
-
-
 
 从图中可以看出，两个类的继承体系有些不同。虽然都实现了Map、Cloneable、Serializable三个接口。但是HashMap继承自抽象类AbstractMap，而HashTable继承自抽象类Dictionary。其中Dictionary类是一个已经被废弃的类，这一点我们可以从它代码的注释中看到：
 
@@ -310,29 +308,5 @@ If a thread-safe implementation is not needed, it is recommended to use HashMap 
 虽然HashMap和HashTable的公开接口应该不会改变，或者说改变不频繁。但每一版本的JDK，都会对HashMap和HashTable的内部实现做优化，比如上文曾提到的JDK 1.8的红黑树优化。所以，尽可能的使用新版本的JDK吧，除了那些炫酷的新功能，普通的API也会有性能上有提升。
 
 为什么HashTable已经淘汰了，还要优化它？因为有老的代码还在使用它，所以优化了它之后，这些老的代码也能获得性能提升。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
