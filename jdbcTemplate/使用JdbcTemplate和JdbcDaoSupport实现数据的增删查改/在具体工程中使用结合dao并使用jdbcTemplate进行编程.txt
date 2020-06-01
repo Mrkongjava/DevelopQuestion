@@ -1,0 +1,219 @@
+
+
+
+
+1、使用jdbcTemplate和jdbcDaoSupport实现对数据库中的数据的增删该查：
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+首先书写实体类：
+
+
+
+public class Employee {
+	
+	private Integer id;
+	private String lastName;
+	private String email;
+	
+	private Integer dpetId;
+
+	接着是对应的get、set方法
+
+	@Override
+	public String toString() {
+		return "Employee [id=" + id + ", lastName=" + lastName + ", email="
+				+ email + ", dpetId=" + dpetId + "]";
+	}
+}
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+接着书写资源配置文件db.properties
+
+
+
+jdbc.user=root
+jdbc.password=123456
+jdbc.driverClass=com.mysql.jdbc.Driver
+jdbc.jdbcUrl=jdbc:mysql:///spring
+
+jdbc.initPoolSize=5
+jdbc.maxPoolSize=10
+
+
+==================================================================================
+
+
+紧接着到spring的xml配置文件
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<!--自动扫描包-->
+	<context:component-scan base-package="com.atguigu.spring"></context:component-scan>
+	
+	<!-- 导入资源文件 -->
+	<context:property-placeholder location="classpath:db.properties"/>
+	
+	<!-- 配置 C3P0 数据源 -->
+	<bean id="dataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="user" value="${jdbc.user}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
+		<property name="driverClass" value="${jdbc.driverClass}"></property>
+
+		<property name="initialPoolSize" value="${jdbc.initPoolSize}"></property>
+		<property name="maxPoolSize" value="${jdbc.maxPoolSize}"></property>
+	</bean>
+	
+	<!-- 配置 Spirng 的 JdbcTemplate ，若在spring中使用jdbc就一定使用jdbcTemplate-->
+	<bean id="jdbcTemplate" 
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+</beans>
+
+
+
+===================================================================================================================
+
+
+书写dao类
+
+@Repository
+public class EmployeeDao {
+	
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
+	public Employee get(Integer id){
+
+		String sql = "SELECT id, last_name lastName, email FROM employees WHERE id = ?";
+		RowMapper<Employee> rowMapper = new BeanPropertyRowMapper<Employee>(Employee.class);
+		Employee employee = jdbcTemplate.queryForObject(sql, rowMapper, id);
+		
+		return employee;
+	}
+}
+
+
+
+-------------------------------------------------------------------------------------------------------------------
+
+最后是测试代码：package com.atguigu.spring.jdbc;
+
+
+
+public class JDBCTest {
+	
+	private ApplicationContext ctx = null;
+	private JdbcTemplate jdbcTemplate;
+//	private EmployeeDao employeeDao;
+//	private DepartmentDao departmentDao;
+//	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+	
+	{
+		ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+		jdbcTemplate = (JdbcTemplate) ctx.getBean("jdbcTemplate");
+//		employeeDao = ctx.getBean(EmployeeDao.class);
+//		departmentDao = ctx.getBean(DepartmentDao.class);
+//		namedParameterJdbcTemplate = ctx.getBean(NamedParameterJdbcTemplate.class);
+	}
+	
+
+
+	//查询表中指定ID值的整条记录
+	@Test
+	public void testEmployeeDao(){
+		System.out.println(employeeDao.get(1));
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
