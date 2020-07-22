@@ -1,31 +1,40 @@
-HashMap和HashTable有什么不同？
-在面试和被面试的过程中，我问过也被问过这个问题，也见过了不少回答，今天决定写一写自己心目中的理想答案。
+# HashMap 和 HashTable 不同之处
+
+
 
 代码版本
 JDK每一版本都在改进。本文讨论的HashMap和HashTable基于JDK 1.7.0_67。源码见这里
 
 1. 时间
-HashTable产生于JDK 1.1，而HashMap产生于JDK 1.2。从时间的维度上来看，HashMap要比HashTable出现得晚一些。
-
+  HashTable产生于JDK 1.1，而HashMap产生于JDK 1.2。从时间的维度上来看，HashMap要比HashTable出现得晚一些。
 2. 作者
-以下是HashTable的作者：
+  以下是HashTable的作者：
 
 
 以下代码及注释来自java.util.HashTable
 
+```
  @author  Arthur van Hoff
  @author  Josh Bloch
  @author  Neal Gafter
+```
+
+
 以下是HashMap的作者：
 
 
 以下代码及注释来自java.util.HashMap
 
-  @author  Doug Lea
-  @author  Josh Bloch
-  @author  Arthur van Hoff
-  @author  Neal Gafter
+```
+@author  Doug Lea
+@author  Josh Bloch
+@author  Arthur van Hoff
+@author  Neal Gafter
+```
+
 可以看到HashMap的作者多了大神Doug Lea。不了解Doug Lea的，可以看这里。
+
+
 
 3. 对外的接口（API）
 HashMap和HashTable都是基于哈希表来实现键值映射的工具类。讨论他们的不同，我们首先来看一下他们暴露在外的API有什么不同。
@@ -78,9 +87,9 @@ public synchronized V put(K key, V value) {
     if (value == null) {
         throw new NullPointerException();
     }
-
+    
      如果key为null，在调用key.hashCode()时抛出NullPointerException
-
+    
      ...
 }
 
@@ -137,7 +146,7 @@ Entry对象唯一表示一个键值对，有四个属性：
 
 
   The hash table data.
- 
+
 private transient EntryK,V[] table;
 
 
@@ -145,7 +154,7 @@ private transient EntryK,V[] table;
 
 
   The table, resized as necessary. Length MUST Always be a power of two.
- 
+
 transient EntryK,V[] table = (EntryK,V[]) EMPTY_TABLE;
 从代码可以看到，对于哈希桶的内部表示，两个类的实现是一致的。
 
@@ -214,7 +223,7 @@ final int hash(Object k) {
     }
 
     h ^= k.hashCode();
-
+    
      This function ensures that hashCodes that differ only by
      constant multiples at each bit position have a bounded
      number of collisions (approximately 8 at default load factor).
@@ -268,7 +277,7 @@ public SetK keySet() {
   can be created with the Iterator methods disabled.  This is necessary
   to avoid unintentionally increasing the capabilities granted a user
   by passing an Enumeration.
- 
+
 private class EnumeratorT implements EnumerationT, IteratorT {
     Entry[] table = Hashtable.this.table;
     int index = table.length;
@@ -276,19 +285,20 @@ private class EnumeratorT implements EnumerationT, IteratorT {
     EntryK,V lastReturned = null;
     int type;
 
-    
+
       Indicates whether this Enumerator is serving as an Iterator
       or an Enumeration.  (true - Iterator).
      
     boolean iterator;
 
-    
+
+?    
       The modCount value that the iterator believes that the backing
       Hashtable should have.  If this expectation is violated, the iterator
       has detected concurrent modification.
      
     protected int expectedModCount = modCount;
-
+    
     Enumerator(int type, boolean iterator) {
         this.type = type;
         this.iterator = iterator;
