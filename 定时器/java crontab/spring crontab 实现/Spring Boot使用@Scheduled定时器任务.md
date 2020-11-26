@@ -1,4 +1,4 @@
-1. 假设已搭建好了一个基于Spring Boot项目，首先要在Application中设置启用定时任务功能 @EnableScheduling。
+1. 假设已搭建好了一个基于Spring Boot项目，首先要在Application中设置启用定时任务功能 @EnableScheduling
 
    ```java
    import org.springframework.boot.SpringApplication;
